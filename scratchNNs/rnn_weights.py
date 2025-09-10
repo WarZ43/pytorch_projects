@@ -2,6 +2,10 @@ import numpy
 import math
 
 class RNNWeights :
+    """
+    from scratch RNN network uses numpy matrixes for better compute speed. parameter N to control how many cells
+    fixed to input of size 1, bptt used to train
+    """
     def __init__(self, N = 1):
         self.N = N
         #xavier
@@ -13,9 +17,12 @@ class RNNWeights :
         self.cache = {}
         self.step_size = 0.0001
         
+    #evaluates the current weights, caches intermediate values and returns MSE when shouldMSE = True
     def simulate(self, data, shouldMse = False):
         H = numpy.zeros((len(data)+1, self.N))
         Y = numpy.zeros((len(data)))
+        
+        #calculate result and cache each intermediate value
         for i in range(len(data)):
             H[i+1] = numpy.tanh(self.w[:,0] * H[i] + self.w[:,1] * data[i] + self.b)
             Y[i] = numpy.sum(self.v * H[i+1]) + self.c
@@ -29,8 +36,11 @@ class RNNWeights :
         
         return MSE
     
+    # back propagation through time, steps = # of steps, step_size  = learning rate
+    #outputs final MSE loss
     def bptt(self, data, steps, step_size = 0.0001):
         self.step_size = step_size
+        #calculate each derivative, back propagate, and accumulate gradient
         for i in range(steps):
             self.simulate(data)
             H, Y = self.cache

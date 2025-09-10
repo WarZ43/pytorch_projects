@@ -3,7 +3,9 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 import math
-
+"""
+Equivalent test program as the scratch lstm test program but implemented in pytorch. Achieves similar loss to scratch test program.
+"""
 airline_passengers = np.array( [
     112, 118, 132, 129, 121, 135, 148, 148, 136, 119, 104, 118,
     115, 126, 141, 135, 125, 149, 170, 170, 158, 133, 114, 140,
@@ -61,3 +63,6 @@ for epoch in range(Epochs):
     optimizer.step()
     if epoch == Epochs-1:
         print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}")
+# output:
+# Using device: cuda
+# Epoch 10000, Loss: 0.0050

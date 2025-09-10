@@ -4,7 +4,10 @@ import torchvision
 import torchvision.transforms as transforms
 import torchvision.utils as vutils
 import matplotlib.pyplot as plt
-
+"""
+    Failed attempt at DCGAN to generate faces by training on CelebA dataset, dropped because testing and training for 
+    tuning hyperparameters takes too long
+"""
 img_size = 64
 bat_size = 128
 nc = 3

@@ -2,7 +2,12 @@ import torch
 import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
+"""_summary_
+    Simple pytorch CNN that gets a final loss of 0.326 and acc of 92.8% on categorizing CIFAR-10
+    
+"""
 
+#transform the training data with randomization to improve generalization
 transf = transforms.Compose([
     transforms.RandomCrop(32, padding=4),
     transforms.RandomHorizontalFlip(p=0.5),
@@ -11,28 +16,30 @@ transf = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))
 ])
+#test transform no randomization
 test_transf = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))
 ])
 
+#load training data with transformation
 total_data = torchvision.datasets.CIFAR10(root = "./data", transform = transf, train = True, download= True)
 
+#select a random 90% as training 10% for validation
 train_data, val_data = torch.utils.data.random_split(total_data, [45000,5000])
 
 train_load = torch.utils.data.DataLoader(train_data, 256, True, num_workers=8)
 
 val_loader = torch.utils.data.DataLoader(val_data, 256, False, num_workers=8)
 
+#load test data with normal transformation
 test_data = torchvision.datasets.CIFAR10(root = "./data", transform = test_transf, train = False, download= True)
 
 test_load = torch.utils.data.DataLoader(test_data, 256, False, num_workers=8)
 
 
-classes = ('plane', 'car', 'bird', 'cat',
-           'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-
-
+# model is 6 Conv2d layers with ReLU activation function, MaxPool2d, and Batchnorm followed by
+# 2 fc layers with batchnorm and dropout
 class myCNN(nn.Module):
     def __init__(self):
         super(myCNN, self).__init__()
@@ -43,7 +50,7 @@ class myCNN(nn.Module):
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(64),
             nn.ReLU(),
-            nn.MaxPool2d(2, 2), # output: 64 x 16 x 16
+            nn.MaxPool2d(2, 2),
 
             nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(128),
@@ -51,7 +58,7 @@ class myCNN(nn.Module):
             nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(128),
             nn.ReLU(),
-            nn.MaxPool2d(2, 2), # output: 128 x 8 x 8
+            nn.MaxPool2d(2, 2),
 
             nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(256),
@@ -59,8 +66,8 @@ class myCNN(nn.Module):
             nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(256),
             nn.ReLU(),
-            nn.MaxPool2d(2, 2), # output: 256 x 4 x 4
-
+            nn.MaxPool2d(2, 2),
+            
             nn.Flatten(), 
             nn.Linear(256*4*4, 1024),
             nn.BatchNorm1d(1024),
@@ -81,6 +88,7 @@ class myCNN(nn.Module):
  
 model = myCNN()
 
+#use gpu
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", device)
 
@@ -88,15 +96,18 @@ model = model.to(device)
 
 
 
-
+#100 time steps
 Epochs = 100
 criterion = nn.CrossEntropyLoss()
 opt = torch.optim.Adam(model.parameters(), lr=0.01)
 scheduler = torch.optim.lr_scheduler.OneCycleLR(
     opt, max_lr=0.01, steps_per_epoch=len(train_load), epochs=Epochs
 )
+
+#train CNN
 for epoch in range(Epochs):
     running_loss = 0.
+    #train
     model.train()
     for images, labels in train_load:
         images, labels = images.to(device), labels.to(device)
@@ -108,7 +119,7 @@ for epoch in range(Epochs):
         scheduler.step()
 
         running_loss += loss.item() * images.size(0)
-    
+    #validate
     model.eval()
     val_running_loss = 0
     val_running_correct = 0
@@ -126,6 +137,7 @@ for epoch in range(Epochs):
 
 model.eval()
 
+#test CNN
 running_loss = 0
 running_correct =0
 with torch.no_grad():

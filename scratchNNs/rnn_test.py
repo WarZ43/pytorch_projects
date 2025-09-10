@@ -2,6 +2,7 @@ from rnn_weights import RNNWeights
 import math
 import numpy as np
 
+#initialie RNN with 5 cells
 weights = RNNWeights(5)
 airline_passengers = np.array( [
     112, 118, 132, 129, 121, 135, 148, 148, 136, 119, 104, 118,
@@ -17,7 +18,17 @@ airline_passengers = np.array( [
     360, 342, 406, 396, 420, 472, 548, 559, 463, 407, 362, 405,
     417, 391, 419, 461, 472, 535, 622, 606, 508, 461, 390, 432
 ], dtype = float)
+#scale data down
 airline_passengers = airline_passengers/622
-print((math.sqrt(weights.bptt(airline_passengers,100000,0.0001)) *622) ** 2)
+#train for 100,000 steps, 0.0001 learnig rate
+print(weights.bptt(airline_passengers,100000,0.0001))
 print(weights.w)
 print(weights.b)
+# output:
+# loss: 0.0025918229956611314
+# weights.w: [[-0.80026408  0.89461895]
+#  [ 0.64917482 -1.21691774]
+#  [-0.34119674  0.68323432]
+#  [-0.36826907  1.04598414]
+#  [ 0.6691286   0.53002995]]
+# weights.b: [-0.05168948 -0.05012262  0.28385357 -0.45462518  0.02601862]
