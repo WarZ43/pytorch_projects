@@ -49,3 +49,17 @@ if shouldPrint:
     print("Weight Shapes:")
     print(f"W_q: {model.W_q.shape}")
     print(f"W_final: {model.W_final.shape}")
+    
+    
+    
+#Final output:
+# Training on 143 time steps...
+# ------------------------------
+# Final Loss (MSE): 0.00033
+# ------------------------------
+# Sample Predictions vs Actuals (Last 5 steps):
+# Step 142: Pred: 0.6712 | Actual: 0.6945
+# Step 141: Pred: 0.6667 | Actual: 0.6270
+# Step 140: Pred: 0.7278 | Actual: 0.7412
+# Step 139: Pred: 0.8313 | Actual: 0.8167
+# Step 138: Pred: 0.9481 | Actual: 0.9743
